@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUMIÈRE 后台管理</title>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- 侧边栏 -->
+    <aside class="admin-sidebar">
+        <div class="sidebar-brand">
+            <span class="brand-icon">✦</span>
+            <span class="brand-text">LUMIÈRE Admin</span>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active" data-page="dashboard">
+                <span class="nav-icon">📊</span>
+                <span>数据看板</span>
+            </a>
+            <a href="#" class="nav-item" data-page="banners">
+                <span class="nav-icon">🖼️</span>
+                <span>Banner管理</span>
+            </a>
+            <a href="#" class="nav-item" data-page="products">
+                <span class="nav-icon">📦</span>
+                <span>商品管理</span>
+            </a>
+            <a href="#" class="nav-item" data-page="orders">
+                <span class="nav-icon">📋</span>
+                <span>订单管理</span>
+            </a>
+            <a href="#" class="nav-item" data-page="customers">
+                <span class="nav-icon">👥</span>
+                <span>客户管理</span>
+            </a>
+            <a href="#" class="nav-item" data-page="ai">
+                <span class="nav-icon">🤖</span>
+                <span>AI 助手</span>
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="index.html" target="_blank" class="nav-item">
+                <span class="nav-icon">🌐</span>
+                <span>查看前台</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- 主内容 -->
+    <main class="admin-main">
+        <header class="admin-topbar">
+            <h1 id="page-title">数据看板</h1>
+            <div class="topbar-right">
+                <span id="current-date"></span>
+            </div>
+        </header>
+
+        <!-- 数据看板 -->
+        <section id="page-dashboard" class="admin-page active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon-wrap" style="background:rgba(0,113,227,0.08)">💰</div>
+                    <div class="stat-info">
+                        <span class="stat-label">今日销售额</span>
+                        <span class="stat-value" id="stat-revenue">¥0</span>
+                    </div>
+                    <span class="stat-trend up">↑ 12.5%</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon-wrap" style="background:rgba(48,209,88,0.08)">📦</div>
+                    <div class="stat-info">
+                        <span class="stat-label">今日订单</span>
+                        <span class="stat-value" id="stat-orders">0</span>
+                    </div>
+                    <span class="stat-trend up">↑ 8.3%</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon-wrap" style="background:rgba(191,90,242,0.08)">👥</div>
+                    <div class="stat-info">
+                        <span class="stat-label">客户总数</span>
+                        <span class="stat-value" id="stat-customers">0</span>
+                    </div>
+                    <span class="stat-trend up">↑ 5.1%</span>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon-wrap" style="background:rgba(255,149,10,0.08)">🔄</div>
+                    <div class="stat-info">
+                        <span class="stat-label">转化率</span>
+                        <span class="stat-value" id="stat-conversion">0%</span>
+                    </div>
+                    <span class="stat-trend down">↓ 1.2%</span>
+                </div>
+            </div>
+
+            <div class="charts-row">
+                <div class="chart-card">
+                    <h3>销售趋势（近7天）</h3>
+                    <div class="chart-container" id="sales-chart"></div>
+                </div>
+                <div class="chart-card">
+                    <h3>品类占比</h3>
+                    <div class="chart-container" id="category-chart"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>最近订单</h3>
+                    <a href="#" class="card-link" onclick="switchPage('orders');return false">查看全部 →</a>
+                </div>
+                <table class="data-table">
+                    <thead><tr><th>订单号</th><th>客户</th><th>商品</th><th>金额</th><th>状态</th><th>时间</th></tr></thead>
+                    <tbody id="recent-orders"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Banner管理 -->
+        <section id="page-banners" class="admin-page">
+            <div class="page-toolbar">
+                <div class="search-box"></div>
+                <button class="btn btn-primary" id="add-banner-btn">+ 添加Banner</button>
+            </div>
+            <div class="card">
+                <table class="data-table">
+                    <thead><tr><th>预览</th><th>标题</th><th>副标题</th><th>操作</th></tr></thead>
+                    <tbody id="banners-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 商品管理 -->
+        <section id="page-products" class="admin-page">
+            <div class="page-toolbar">
+                <div class="search-box">
+                    <input type="text" id="product-search" placeholder="搜索商品...">
+                </div>
+                <div class="toolbar-actions">
+                    <select id="category-filter">
+                        <option value="">全部分类</option>
+                        <option value="digital">数码科技</option>
+                        <option value="fashion">时尚穿搭</option>
+                        <option value="home">家居生活</option>
+                        <option value="beauty">美妆护肤</option>
+                        <option value="food">美食甄选</option>
+                    </select>
+                    <button class="btn btn-primary" id="add-product-btn">+ 添加商品</button>
+                </div>
+            </div>
+            <div class="card">
+                <table class="data-table">
+                    <thead><tr><th>商品</th><th>分类</th><th>价格</th><th>库存</th><th>状态</th><th>操作</th></tr></thead>
+                    <tbody id="products-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 订单管理 -->
+        <section id="page-orders" class="admin-page">
+            <div class="page-toolbar">
+                <div class="filter-group">
+                    <button class="filter-btn active" data-filter="all">全部</button>
+                    <button class="filter-btn" data-filter="pending">待处理</button>
+                    <button class="filter-btn" data-filter="shipped">已发货</button>
+                    <button class="filter-btn" data-filter="completed">已完成</button>
+                </div>
+            </div>
+            <div class="card">
+                <table class="data-table">
+                    <thead><tr><th>订单号</th><th>客户</th><th>商品</th><th>金额</th><th>状态</th><th>时间</th><th>操作</th></tr></thead>
+                    <tbody id="orders-table"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 客户管理 -->
+        <section id="page-customers" class="admin-page">
+            <div class="page-toolbar">
+                <div class="search-box">
+                    <input type="text" id="customer-search" placeholder="搜索客户...">
+                </div>
+                <button class="btn btn-primary" id="add-customer-btn">+ 添加客户</button>
+            </div>
+            <div class="customers-grid" id="customers-grid"></div>
+        </section>
+
+        <!-- AI 助手 -->
+        <section id="page-ai" class="admin-page">
+            <div class="ai-layout">
+                <div class="ai-tools-panel">
+                    <h3>AI 设置</h3>
+                    <div class="tool-card" data-tool="settings" style="border-color:var(--primary)">
+                        <span class="tool-icon">🔑</span>
+                        <span class="tool-name">API 密钥配置</span>
+                        <p>手动输入密钥，安全不泄露</p>
+                    </div>
+                    <h3 style="margin-top:16px">AI 工具</h3>
+                    <div class="tool-card" data-tool="description">
+                        <span class="tool-icon">📝</span>
+                        <span class="tool-name">商品描述生成</span>
+                        <p>根据关键词AI生成商品描述</p>
+                    </div>
+                    <div class="tool-card" data-tool="pricing">
+                        <span class="tool-icon">💹</span>
+                        <span class="tool-name">智能定价建议</span>
+                        <p>基于市场分析推荐价格</p>
+                    </div>
+                    <div class="tool-card" data-tool="review">
+                        <span class="tool-icon">🔍</span>
+                        <span class="tool-name">评价分析</span>
+                        <p>AI分析客户评价情感</p>
+                    </div>
+                </div>
+                <div class="ai-chat-panel">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="chat-msg ai">
+                            <span class="msg-avatar">🤖</span>
+                            <div class="msg-content">你好！我是LUMIÈRE的AI运营助手，可以帮你生成商品描述、提供定价建议、分析客户评价。选择左侧工具或直接输入问题。</div>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chat-input" placeholder="输入消息或关键词...">
+                        <button class="btn btn-primary" id="chat-send">发送</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 商品编辑模态框 -->
+    <div id="product-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="product-modal-title">添加商品</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="product-form" class="modal-form">
+                <input type="hidden" id="p-edit-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>商品名称</label>
+                        <input type="text" id="p-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>分类</label>
+                        <select id="p-category">
+                            <option value="digital">数码科技</option>
+                            <option value="fashion">时尚穿搭</option>
+                            <option value="home">家居生活</option>
+                            <option value="beauty">美妆护肤</option>
+                            <option value="food">美食甄选</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>售价 (¥)</label>
+                        <input type="number" id="p-price" required min="0" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label>原价 (¥)</label>
+                        <input type="number" id="p-original-price" min="0" step="0.01">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>库存</label>
+                        <input type="number" id="p-stock" required min="0">
+                    </div>
+                    <div class="form-group">
+                        <label>状态</label>
+                        <select id="p-status">
+                            <option value="active">在售</option>
+                            <option value="inactive">下架</option>
+                            <option value="lowstock">库存不足</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>商品描述</label>
+                    <div class="input-with-ai">
+                        <textarea id="p-desc" rows="3" placeholder="输入商品描述..."></textarea>
+                        <button type="button" class="ai-btn" id="ai-gen-desc">🤖 AI生成</button>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>关键词（AI生成用，逗号分隔）</label>
+                    <input type="text" id="p-keywords" placeholder="例如：无线,蓝牙,降噪">
+                </div>
+                <div class="form-group">
+                    <label>规格标签（逗号分隔）</label>
+                    <input type="text" id="p-specs" placeholder="例如：蓝牙5.0,主动降噪,20小时续航">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="closeProductModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 客户编辑模态框 -->
+    <div id="customer-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="customer-modal-title">添加客户</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="customer-form" class="modal-form">
+                <input type="hidden" id="c-edit-id">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>客户姓名</label>
+                        <input type="text" id="c-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label>等级</label>
+                        <select id="c-level">
+                            <option value="普通">普通</option>
+                            <option value="银卡">银卡</option>
+                            <option value="金卡">金卡</option>
+                            <option value="钻石">钻石</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>手机号</label>
+                        <input type="text" id="c-phone">
+                    </div>
+                    <div class="form-group">
+                        <label>邮箱</label>
+                        <input type="email" id="c-email">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>地址</label>
+                    <input type="text" id="c-address">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="closeCustomerModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Banner编辑模态框 -->
+    <div id="banner-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="banner-modal-title">添加Banner</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="banner-form" class="modal-form">
+                <input type="hidden" id="b-edit-id">
+                <div class="form-group">
+                    <label>标题</label>
+                    <input type="text" id="b-title" required placeholder="例如：春季焕新">
+                </div>
+                <div class="form-group">
+                    <label>副标题</label>
+                    <input type="text" id="b-subtitle" required placeholder="例如：新品上市 限时9折">
+                </div>
+                <div class="form-group">
+                    <label>渐变背景（选填，如 #f5f5f7,#e8e8ed）</label>
+                    <input type="text" id="b-gradient" placeholder="留空使用默认渐变">
+                </div>
+                <div class="form-group">
+                    <label>链接（选填）</label>
+                    <input type="text" id="b-link" placeholder="点击跳转的页面">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="closeBannerModal()">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- API 密钥设置模态框 -->
+    <div id="apikey-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>API 密钥配置</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="apikey-form" class="modal-form">
+                <div class="form-group">
+                    <label>AI 服务商</label>
+                    <select id="ak-provider">
+                        <option value="claude">Claude (Anthropic)</option>
+                        <option value="glm">GLM (智谱)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>API 密钥</label>
+                    <input type="password" id="ak-key" placeholder="粘贴你的 API Key..." required>
+                </div>
+                <div class="form-group">
+                    <label>模型名称（可选）</label>
+                    <input type="text" id="ak-model" placeholder="留空使用默认模型">
+                </div>
+                <p style="font-size:12px;color:var(--text-muted);margin-bottom:12px">密钥仅保存在当前浏览器本地，不会上传到任何服务器。</p>
+                <div class="form-actions">
+                    <button type="button" class="btn" onclick="document.getElementById('apikey-modal').classList.remove('active')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+    <script src="admin.js"></script>
+</body>
+</html>
